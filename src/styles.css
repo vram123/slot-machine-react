@@ -1,0 +1,548 @@
+/* === Global layout ======================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+body, html {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+.app {
+  background-image: url("/casino-bg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* stays static like a real casino wall */
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+  color: #e5e7eb;
+  background:
+    radial-gradient(circle at 10% 0%, #1e293b 0, #020617 55%, #000000 100%),
+    radial-gradient(circle at 90% 120%, #1d1b4a 0, #020617 60%, #000 100%);
+  background-blend-mode: screen, normal;
+}
+
+/* App wrapper */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  padding: 1.2rem 1rem 0.4rem;
+  color: #f9fafb;
+  text-shadow: 0 0 10px rgba(15, 23, 42, 0.9);
+}
+
+.header h1 {
+  font-size: 1.9rem;
+  margin: 0;
+}
+
+.header p {
+  margin: 0.25rem 0 0.5rem;
+  opacity: 0.85;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem 2rem;
+}
+
+.footer {
+  text-align: center;
+  padding: 0.5rem 1rem 1rem;
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+/* === Machine shell (cabinet + wheel arch) ================================ */
+
+.machine-shell {
+  position: relative;
+  margin: 3rem auto 2.5rem;
+  padding-top: 8.5rem; /* room for wheel arch */
+}
+
+/* glowing wheel above the machine */
+.machine-shell::before {
+  content: "";
+  position: absolute;
+  top: -2.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #facc15 0deg,
+    #f97316 60deg,
+    #ec4899 120deg,
+    #22c55e 180deg,
+    #0ea5e9 240deg,
+    #a855f7 300deg,
+    #facc15 360deg
+  );
+  box-shadow:
+    0 0 30px rgba(250, 204, 21, 0.8),
+    0 0 60px rgba(56, 189, 248, 0.6),
+    0 15px 40px rgba(0, 0, 0, 0.9);
+  border: 10px solid #020617;
+}
+
+
+
+/* text sitting on the arch, like WHEEL OF FORTUNE label */
+.machine-arch-label {
+  position: absolute;
+  top: 6.3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.25rem 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0f172a, #1f2937, #0f172a);
+  border: 2px solid rgba(249, 250, 251, 0.45);
+  color: #fef9c3;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  box-shadow:
+    0 0 12px rgba(59, 130, 246, 0.9),
+    0 0 20px rgba(250, 204, 21, 0.7);
+}
+
+/* cabinet base */
+.machine-base {
+  width: 280px;
+  height: 32px;
+  margin: 0.9rem auto 0;
+  border-radius: 0 0 18px 18px;
+  background: linear-gradient(180deg, #020617, #111827);
+  box-shadow:
+    0 -4px 10px rgba(15, 23, 42, 0.9),
+    0 10px 30px rgba(0, 0, 0, 0.9);
+  border: 1px solid #020617;
+}
+
+/* === Card / machine body ================================================= */
+
+.card {
+  position: relative;
+  background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #020617 100%);
+  border-radius: 18px;
+  padding: 1.6rem 1.6rem 1.4rem;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  border: 2px solid rgba(34, 211, 238, 0.95);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.9),
+    0 0 45px rgba(59, 130, 246, 0.8);
+  overflow: hidden;
+}
+
+/* narrow inner glow border */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  pointer-events: none;
+}
+
+/* === Top row: jackpot + balance ========================================= */
+
+.machine-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.jackpot-display {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #b91c1c, #ea580c);
+  box-shadow:
+    0 0 18px rgba(248, 113, 113, 0.7),
+    0 0 25px rgba(251, 146, 60, 0.9);
+}
+
+.jackpot-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fffbeb;
+  opacity: 0.9;
+}
+
+.jackpot-amount {
+  font-weight: 800;
+  color: #fef9c3;
+}
+
+.machine-balance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+  color: #e5e7eb;
+}
+
+/* === Control panel ======================================================= */
+
+.panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel .group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.group-bet label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #cbd5f5;
+}
+
+/* inputs */
+
+input[type="number"] {
+  background: radial-gradient(circle at 0 0, #1f2937 0, #020617 80%);
+  border: 1px solid #4b5563;
+  color: #e2e8f0;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.6rem;
+  width: 120px;
+  font-size: 0.9rem;
+  box-shadow: inset 0 0 8px rgba(15, 23, 42, 0.9);
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border-color: #22d3ee;
+  box-shadow:
+    0 0 12px rgba(34, 211, 238, 0.7),
+    inset 0 0 8px rgba(15, 23, 42, 0.95);
+}
+
+/* buttons */
+
+button {
+  background: linear-gradient(135deg, #f97316, #facc15);
+  border: none;
+  color: #111827;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow:
+    0 0 15px rgba(251, 146, 60, 0.9),
+    0 8px 18px rgba(0, 0, 0, 0.85);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    filter 0.12s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow:
+    0 0 18px rgba(250, 204, 21, 0.9),
+    0 10px 20px rgba(0, 0, 0, 0.9);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 10px rgba(250, 204, 21, 0.7),
+    0 4px 12px rgba(0, 0, 0, 0.85);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.ghost {
+  background: radial-gradient(circle at 10% 0, #111827 0, #020617 90%);
+  color: #e5e7eb;
+  border: 1px solid #4b5563;
+  box-shadow: inset 0 0 6px rgba(15, 23, 42, 0.9);
+}
+
+.bet-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.bet-buttons .small {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.group-actions {
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+/* big glowing SPIN button */
+
+.btn-spin {
+  min-width: 130px;
+  font-size: 1rem;
+  background: radial-gradient(circle at 30% 0, #fbbf24 0, #f97316 45%, #b91c1c 100%);
+  color: #111827;
+}
+
+.btn-spin::after {
+  content: "";
+  position: absolute;
+}
+
+/* Reset button tweak */
+
+.btn-reset {
+  font-size: 0.85rem;
+}
+
+/* === Reels =============================================================== */
+
+.reels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0.9rem 0 1.1rem;
+}
+
+.reel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 108px;
+  border-radius: 0.9rem;
+  border: 2px solid #4b5563;
+  background:
+    radial-gradient(circle at 30% 0, #111827 0, #020617 70%),
+    linear-gradient(180deg, #020617, #020617);
+  font-size: 3.1rem;
+  overflow: hidden;
+  box-shadow:
+    inset 0 12px 20px rgba(0, 0, 0, 0.85),
+    inset 0 -10px 18px rgba(15, 23, 42, 0.8);
+}
+
+.shadow-inset::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.9rem;
+  box-shadow:
+    inset 0 8px 18px rgba(0, 0, 0, 0.6),
+    inset 0 -8px 16px rgba(15, 23, 42, 0.85);
+  pointer-events: none;
+}
+
+/* reel "spin" animation */
+
+.spin {
+  animation: spin 350ms ease;
+}
+
+@keyframes spin {
+  0% {
+    transform: translateY(-18%);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* === Result row ========================================================== */
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.9rem;
+}
+
+.result-text {
+  font-weight: 700;
+}
+
+.success {
+  color: #22c55e;
+}
+
+.danger {
+  color: #f97373;
+}
+
+.muted {
+  opacity: 0.8;
+}
+
+.tip-text {
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+/* === Payout / paytable area ============================================= */
+
+.jackpot-guide {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at 0 0, #1f2937 0, #020617 80%);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+.jackpot-guide strong {
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  color: #fde68a;
+}
+
+.jackpot-guide ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.25rem 0 0;
+}
+
+.jackpot-guide li {
+  margin: 0.1rem 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+/* symbol breakdown */
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: radial-gradient(circle at 0 0, #111827 0, #020617 90%);
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.65);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+.stat-icon {
+  font-size: 1.1rem;
+}
+
+.stat-label {
+  white-space: nowrap;
+}
+
+/* === Responsive tweaks =================================================== */
+
+@media (max-width: 640px) {
+  .machine-shell {
+    padding-top: 7.5rem;
+  }
+
+  .machine-shell::before {
+    width: 320px;
+    height: 320px;
+    top: -3rem; 
+  }
+
+  .machine-shell::after {
+    width: 130px;
+    height: 130px;
+  }
+
+  .card {
+    padding: 1.3rem 1.1rem 1.2rem;
+  }
+
+  .machine-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .machine-balance {
+    align-items: flex-start;
+  }
+
+  .panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .group-actions {
+    align-self: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .reels {
+    gap: 0.6rem;
+  }
+
+  .reel {
+    height: 96px;
+    font-size: 2.7rem;
+  }
+}
