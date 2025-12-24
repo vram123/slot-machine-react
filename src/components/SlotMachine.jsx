@@ -1,18 +1,18 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
-// 🔊 global audio objects (served from /public/sounds)
+//  global audio objects (served from /public/sounds)
 const spinSound = new Audio("/sounds/spin.wav");
 const jackpotSound = new Audio("/sounds/jackpot.wav");
 
 const JACKPOT_SEED = 1262132.28;
 
 const SYMBOLS = [
-  { icon: "🍒", name: "Cherry",  weight: 120, payout3: 5,   payout2: 0 },
-  { icon: "🍋", name: "Lemon",   weight: 120, payout3: 5,   payout2: 0 },
-  { icon: "🔔", name: "Bell",    weight: 90,  payout3: 8,   payout2: 1 },
-  { icon: "🍀", name: "Clover",  weight: 60,  payout3: 12,  payout2: 2 },
-  { icon: "💎", name: "Diamond", weight: 30,  payout3: 20,  payout2: 8 },
-  { icon: "7️⃣", name: "7",      weight: 9,   payout3: 2000,payout2: 80 },
+  { icon: "🍒", name: "Cherry", weight: 120, payout3: 5, payout2: 0 },
+  { icon: "🍋", name: "Lemon", weight: 120, payout3: 5, payout2: 0 },
+  { icon: "🔔", name: "Bell", weight: 90, payout3: 8, payout2: 1 },
+  { icon: "🍀", name: "Clover", weight: 60, payout3: 12, payout2: 2 },
+  { icon: "💎", name: "Diamond", weight: 30, payout3: 20, payout2: 8 },
+  { icon: "7️⃣", name: "7", weight: 9, payout3: "jackpot", payout2: 80 },
 ];
 
 // format the jackpot like real casino signs
@@ -41,6 +41,9 @@ export default function SlotMachine() {
   const [busy, setBusy] = useState(false);
   const [lastResult, setLastResult] = useState(null); // { kind, amount, text, mult }
   const [jackpot, setJackpot] = useState(JACKPOT_SEED); // progressive jackpot
+
+  // ✅ Auto-spin state (only adds requested behavior)
+  const [autoSpin, setAutoSpin] = useState(false);
 
   function spinOnce() {
     return [
@@ -135,13 +138,10 @@ export default function SlotMachine() {
       // 2) Tease third reel, slowing down
       const steps = 7;
       for (let i = 0; i < steps; i++) {
-        const randomSymbol =
-          bag[Math.floor(Math.random() * bag.length)].icon;
+        const randomSymbol = bag[Math.floor(Math.random() * bag.length)].icon;
         setReels([s0.icon, s1.icon, randomSymbol]);
         // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) =>
-          setTimeout(r, 120 + i * 40)
-        );
+        await new Promise((r) => setTimeout(r, 120 + i * 40));
       }
 
       // 3) Land on the actual winning symbol
@@ -167,12 +167,17 @@ export default function SlotMachine() {
       mult,
     });
 
-    // 🔊 jackpot sound rules:
+    // 🔊 win sound rules (ONLY changed per your request):
     // - always plays if 3x7 jackpot
-    // - also plays if the user gets 2 or more diamonds
+    // - plays if the user gets 2 or more diamonds
+    // - plays if the user gets 3 clovers
+    // - plays if the user gets 3 bells
     const icons = finalDraw.map((d) => d.icon);
     const diamonds = icons.filter((i) => i === "💎").length;
-    const playJackpotSfx = jackpotHit || diamonds >= 2;
+    const clovers = icons.filter((i) => i === "🍀").length;
+    const bells = icons.filter((i) => i === "🔔").length;
+
+    const playJackpotSfx = jackpotHit || diamonds >= 2 || clovers === 3 || bells === 3;
 
     if (playJackpotSfx) {
       try {
@@ -196,7 +201,41 @@ export default function SlotMachine() {
     setBusy(false);
   }
 
+  useEffect(() => {
+    if (!autoSpin) return;
+  
+    let cancelled = false;
+  
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  
+    const loop = async () => {
+      while (!cancelled) {
+        // stop if broke
+        if (balance <= 0) {
+          setAutoSpin(false);
+          break;
+        }
+        await sleep(3000); 
+        if (!busy) {
+          await handleSpin();      // do one full spin
+          await sleep(3000);
+          
+        } else {
+          await sleep(3000);        // ✅ important: prevents tight-loop freezing
+        }
+      }
+    };
+    
+    loop();
+  
+    return () => {
+      cancelled = true;
+    };
+  }, [autoSpin, balance, busy]);
+  
   function reset() {
+    // ✅ if user resets while auto-spin is on, stop it
+    setAutoSpin(false);
     setBalance(100);
     setBet(5);
     setLastResult(null);
@@ -212,9 +251,7 @@ export default function SlotMachine() {
         <div className="machine-top-row">
           <div className="jackpot-display">
             <span className="jackpot-label">JACKPOT</span>
-            <span className="jackpot-amount">
-              {formatCurrency(jackpot)}
-            </span>
+            <span className="jackpot-amount">{formatCurrency(jackpot)}</span>
           </div>
           <div className="machine-balance">
             <span>Balance: ${balance}</span>
@@ -275,11 +312,18 @@ export default function SlotMachine() {
             >
               Spin
             </button>
+
+            {/* ✅ Auto Spin button added next to existing buttons (no layout redesign) */}
             <button
               className="ghost btn-reset"
-              onClick={reset}
-              disabled={busy}
+              onClick={() => setAutoSpin((v) => !v)}
+              disabled={balance <= 0}
+              title="Auto Spin"
             >
+              {autoSpin ? "Stop Auto" : "Auto Spin"}
+            </button>
+
+            <button className="ghost btn-reset" onClick={reset} disabled={busy}>
               Reset
             </button>
           </div>
@@ -297,12 +341,9 @@ export default function SlotMachine() {
                   : "result-text danger"
               }
             >
-              {lastResult.text}{" "}
-              {lastResult.mult ? `(±$${lastResult.amount})` : ""}
+              {lastResult.text} {lastResult.mult ? `(±$${lastResult.amount})` : ""}
             </div>
-            <div className="muted tip-text">
-              
-            </div>
+            <div className="muted tip-text"></div>
           </div>
         )}
 
